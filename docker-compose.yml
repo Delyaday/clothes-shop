@@ -1,0 +1,38 @@
+version: '3.4'
+
+networks:
+  application-network:
+    driver: bridge
+
+
+services:
+
+  server.web:
+    image: ${DOCKER_REGISTRY-}serverweb
+    depends_on:
+      - "db"
+    build:
+      context: .
+      dockerfile: src/Server.Web/Dockerfile
+    environment:
+      DB_CONNECTION_STRING: "host=db;port=5432;database=ClothesShopDb;username=postgres;password=postgres1"
+    networks:
+      - application-network
+
+  db:
+   image: postgres
+   restart: always
+   ports:
+     - 5433:5432
+   volumes:
+      - db_volume:/var/lib/postgresql/data
+   environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres1"
+      POSTGRES_DB: "ClothesShopDb"
+   networks:
+     - application-network
+
+
+volumes:
+   db_volume:
